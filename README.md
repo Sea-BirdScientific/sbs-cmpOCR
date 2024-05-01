@@ -12,5 +12,5 @@ The example_data directory contains two HOCR files you can use to test and view 
 * **pip install streamlit** into a virtual environment that also has plotly, pandas, pathlib
 * git clone https://github.com/Sea-BirdScientific/sbs-cmpOCR.git
 * cd sbs-cmpOCR
-* From OS command line: streamlit run ./src/sbs-cmpOCR/cmpOCRst.py. (This should open a browser window at http://localhost:8501)
+* From OS command line: **streamlit run ./src/sbs-cmpOCR/cmpOCRst.py** (This should open a browser window at http://localhost:8501)
 * After you drag and drop the two HOCR calfiles found in ./example_data, you should see two plotly plots
