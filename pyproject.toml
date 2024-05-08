@@ -29,6 +29,10 @@ dependencies = [
     "build",
     "pytest",
     "tox",
+    "streamlit",
+    "plotly",
+    "pandas"
+    
 ]
 
 [build-system]
