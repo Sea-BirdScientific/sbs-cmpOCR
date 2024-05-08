@@ -1,5 +1,5 @@
+re
+streamlit
 pandas
 plotly
-streamlit
-pathlib
-re
+pathlib 
