@@ -3,7 +3,7 @@
 # The name of the directory in src will be the import name
 #
 
-[project]
+[tool.poetry]
 name = "sbs-cmpOCR"
 version = "1.0.0-alpha.0"
 description = "Compare two (H)OCR files"
@@ -25,9 +25,7 @@ classifiers = [
     "Private :: Do Not Upload",
 ]
 
-dependencies = [
-    "streamlit",
-    "plotly",
-    "pandas"
-    
-]
+[tool.poetry.dependencies]
+streamlit
+plotly
+pandas
