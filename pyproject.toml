@@ -16,7 +16,7 @@ authors = [
 ]
 
 maintainers = [
-    {name = "Eric Rehm", email = "erehm@seabird.com"/lc,
+    {name = "Eric Rehm", email = "erehm@seabird.com"},
 ]
 
 # For a list of valid classifiers, see https://pypi.org/classifiers/
