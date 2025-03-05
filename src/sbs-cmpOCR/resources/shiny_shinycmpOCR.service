@@ -1,0 +1,22 @@
+# /etc/systemd/system/shiny_shinyArgoTechData.service
+[Unit]
+Description=Shiny for Python shinyArgoTechData
+After=network.target
+
+[Service]
+#User=root  # CHANGE THIS to your actual username
+#Group=root
+User=erehm  
+Group=www-data
+WorkingDirectory=/home/erehm/src/sbs-cmpOCR/src/sbs-cmpOCR
+Environment="PATH=/home/erehm/.conda/envs/dash311/bin:$PATH"
+Environment="CONDA_DEFAULT_ENV=dash311"
+ExecStart=/home/erehm/.conda/envs/dash311/bin/uvicorn app:app --host 10.128.44.101 --port 8103 --root-path /shiny/cmpOCR
+#ExecStartPre=/bin/bash -c "env > /tmp/service_env.log"
+#ExecStart=/bin/bash -c 'source /opt/conda/etc/profile.d/conda.sh && conda activate dash311 && /home/erehm/.conda/envs/dash311/bin/uvicorn app:app --host 10.128.44.101 --port 8101 --root-path /shiny/shinyArgoTechData'
+#ExecStartPost=/bin/bash -c "cat /tmp/service_env.log >> /tmp/shiny_debug.log"
+Restart=always
+AmbientCapabilities=CAP_NET_BIND_SERVICE
+
+[Install]
+WantedBy=multi-user.target
