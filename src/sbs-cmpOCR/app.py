@@ -7,12 +7,11 @@ shiny run --reload --launch-browser ./app.py
 import re
 import pandas as pd
 import plotly.graph_objs as go
+from plotly.subplots import make_subplots
 from shiny import App, ui, reactive
 import shinyswatch
 from shinywidgets import output_widget, render_widget
 
-
-# Function to read calibration file
 def SATgetCal(calFile):
     """Read Satlantic-formated (H)OCR cal files for wavelength, scale Factors, and integration time"""
     calTags = {'ES', 'ED', 'Eu', 'LU', 'LT', 'LI'}
@@ -33,24 +32,21 @@ def SATgetCal(calFile):
                 scaleFactor = float(tsplit[1])
                 intTime = int(float(tsplit[3]) * 1000) if len(tsplit) > 3 else 1
                 dfrow = pd.DataFrame([{'tag': tag, 'w': w, 'scaleFactor': scaleFactor, 'intTime': intTime}])
-                dfcal = pd.concat([dfcal, dfrow], ignore_index=True)
+                dfcal = dfrow if dfcal.empty else pd.concat([dfcal, dfrow], ignore_index=True)
                 fid.readline()  # Skip blank line
 
     return dfcal
 
-# Function to plot files
 def plot_files(df1, df2, name1, name2):
     """Plot the scale factors of two calibration files and their ratio"""
-    fig = go.Figure()
-    fig.add_trace(go.Scatter(x=df1['w'], y=df1['scaleFactor'], mode='lines', name=name1))
-    fig.add_trace(go.Scatter(x=df2['w'], y=df2['scaleFactor'], mode='lines', name=name2))
-    fig.update_layout(legend=dict(x=0.50, y=0.95, xanchor='center', yanchor='top'), autosize=True, height=None)
+    # Create a figure with two subplots sharing the x-axis
+    fig = make_subplots(rows=2, cols=1, shared_xaxes=True)
+    fig.add_trace(go.Scatter(x=df1['w'], y=df1['scaleFactor'], mode='lines', name=name1,legend='legend1'), row=1, col=1)
+    fig.add_trace(go.Scatter(x=df2['w'], y=df2['scaleFactor'], mode='lines', name=name2,legend='legend1'), row=1, col=1)
+    fig.add_trace(go.Scatter(x=df1['w'], y=df2['scaleFactor'] / df1['scaleFactor'], mode='lines', name=f'{name2}/{name1}', legend=None), row=2, col=1)
+    fig.update_layout(legend1=dict(x=0.50, y=0.99, xanchor='center', yanchor='top'), autosize=True, height=700)
 
-    fig2 = go.Figure()
-    fig2.add_trace(go.Scatter(x=df1['w'], y=df2['scaleFactor'] / df1['scaleFactor'], mode='lines', name=f'{name2}/{name1}'))
-    fig2.update_layout(title=f'{name2}/{name1}', autosize=True, height=None)
-
-    return fig, fig2
+    return fig
 
 def app_ui(request) :
     """Define the Shiny app's UI."""
@@ -58,12 +54,11 @@ def app_ui(request) :
         ui.sidebar(
             ui.input_file('file1', 'Upload File 1:', accept=['.cal']),
             ui.input_file('file2', 'Upload File 2:', accept=['.cal']),
-            open="always",  # Always keep the sidebar open
+            # open="always",  # Always keep the sidebar open
             width="25%",    # Set the sidebar width"
         ),
         ui.card(
             output_widget('plot_top'),
-            output_widget('plot_bottom'),
         ),
         title='(H)OCR Cal File Plotter',
         theme=shinyswatch.theme.sandstone(),  # Apply a clean Bootstrap theme
@@ -87,16 +82,7 @@ def server(input, output, session):
         df1, df2, name1, name2 = get_data()
         if df1 is None or df2 is None:
             return None
-        fig, _ = plot_files(df1, df2, name1, name2)
+        fig = plot_files(df1, df2, name1, name2)
         return fig
-
-    @output
-    @render_widget
-    def plot_bottom():
-        df1, df2, name1, name2 = get_data()
-        if df1 is None or df2 is None:
-            return None
-        _, fig2 = plot_files(df1, df2, name1, name2)
-        return fig2
 
 app = App(app_ui, server)
